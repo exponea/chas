@@ -1,4 +1,6 @@
-import sisyphus
+import logging
 
-sisyphus = Sisyphus()
-sisyphus.start(8080)
+logging.basicConfig()
+logger = logging.getLogger("sisyphus")
+logger.setLevel("WARNING")
+logger.info("Initialized sisyphus.")
