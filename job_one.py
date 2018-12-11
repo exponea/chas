@@ -7,7 +7,7 @@ def export_one_a(state):
     print("one_a")
 
 @sisyphus.job("18:12")
-def export_one_basf(state):
+def export_one_b(state):
     print("one_b")
 
 @sisyphus.job("18:02")

@@ -9,12 +9,11 @@ class Job:
     def __init__(self, function, time):
         self.function = function
         self.next_run = time
-        self.last_run = None
+        self.last_run = "N/A"
     
     @property
     def should_run(self):
-        # return datetime.datetime.now() >= self.next_run
-        return True
+        return datetime.datetime.now() >= self.next_run
 
     @property
     def uses_state(self):

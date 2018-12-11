@@ -49,7 +49,7 @@ class Scheduler:
         hour, minute = list(map(lambda x: int(x), time.split(":")))
         datetime_now = datetime.datetime.now()
         # Job cannot be run today, because it is already too late
-        if datetime_now.hour > hour or datetime_now.hour == hour and datetime_now.minute > minute:
+        if datetime_now.hour > hour or datetime_now.hour == hour and datetime_now.minute > minute: # BUG: Even when minutes equal, we should schedule it for the next day
             next_run_time = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day+1, hour, minute)
         # Otherwise schedule it for today
         else:
@@ -66,8 +66,11 @@ class Scheduler:
         for job in self.jobs:
             if job.should_run:
                 job_state = State()
+                logger.info("Running job {}".format(job.name))
                 job.run(job_state)
                 self.history.append(job_state)
+                job.next_run = datetime.datetime.now() + datetime.timedelta(1) # TODO: Precise scheduling HH:MM next day
+                logger.info("Scheduled next run for job {} on {}".format(job.name, job.next_run))
     
     def sort_jobs(self):
         return self.heap_sort(self.jobs)
