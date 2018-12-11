@@ -1,6 +1,3 @@
-import logging
+from scheduler import Scheduler
 
-logging.basicConfig()
-logger = logging.getLogger("sisyphus")
-logger.setLevel("WARNING")
-logger.info("Initialized sisyphus.")
+sisyphus = Scheduler()

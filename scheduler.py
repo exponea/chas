@@ -38,12 +38,18 @@ class Scheduler:
             arr[smallest], arr[i] = arr[i], arr[smallest]
             cls.heapify(arr, n, smallest)
     
+    # Decorator method for adding jobs
+    def job(self, time):
+        def register_job(job):
+            self.register_job(job, time)
+        return register_job
+    
     def register_job(self, function, time):
         # Process time to run job, format has to be HH:MM
         hour, minute = list(map(lambda x: int(x), time.split(":")))
         datetime_now = datetime.datetime.now()
         # Job cannot be run today, because it is already too late
-        if datetime_now.hour > hour:
+        if datetime_now.hour > hour or datetime_now.hour == hour and datetime_now.minute > minute:
             next_run_time = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day+1, hour, minute)
         # Otherwise schedule it for today
         else:
@@ -66,7 +72,6 @@ class Scheduler:
     def sort_jobs(self):
         return self.heap_sort(self.jobs)
     
-    def check_jobs(self):
+    def get_jobs(self):
         self.sort_jobs()
-        for job in self.jobs:
-            print("Job {} scheduled on {}.".format(job.name, job.next_run))
+        return self.jobs
