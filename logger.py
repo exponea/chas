@@ -1,6 +1,5 @@
 import logging
 
-logging.basicConfig()
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("sisyphus")
-logger.setLevel("DEBUG")
 logger.info("Initialized sisyphus.")

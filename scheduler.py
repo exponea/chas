@@ -61,16 +61,33 @@ class Scheduler:
         self.heapify(self.jobs, len(self.jobs), len(self.jobs))
         logger.info("Registered job {}. Next run on {}".format(job.name, next_run_time))
 
-    def run_jobs(self):
-        logger.info("Run all jobs at {}".format(datetime.datetime.now()))
+    # Run specific job by a name
+    def run_job(self, name):
         for job in self.jobs:
-            if job.should_run:
+            if name == job.name:
                 job_state = State()
                 logger.info("Running job {}".format(job.name))
                 job.run(job_state)
-                self.history.append(job_state)
-                job.next_run = datetime.datetime.now() + datetime.timedelta(1) # TODO: Precise scheduling HH:MM next day
-                logger.info("Scheduled next run for job {} on {}".format(job.name, job.next_run))
+                job.last_status = job_state.status
+                return job_state
+        return None
+    
+    # Iterates through all jobs and runs those that should be run by now
+    # It does so by checking the job on top of the heap
+    def run_jobs(self):
+        logger.info("Run all jobs at {}".format(datetime.datetime.now()))
+        n = len(self.jobs)
+        next_job = self.jobs[0]
+        while next_job.should_run:
+            job_state = State()
+            logger.info("Running job {}".format(next_job.name))
+            next_job.run(job_state)
+            next_job.last_state = job_state
+            self.history.append(job_state)
+            next_job.next_run = datetime.datetime.now() + datetime.timedelta(1) # TODO: Precise scheduling HH:MM next day
+            self.heapify(self.jobs, n, 0)
+            logger.info("Scheduled next run for job {} on {}".format(next_job.name, next_job.next_run))
+            next_job = self.jobs[0]
     
     def sort_jobs(self):
         return self.heap_sort(self.jobs)

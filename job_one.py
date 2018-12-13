@@ -5,6 +5,7 @@ from main import sisyphus
 @sisyphus.job("17:59")
 def export_one_a(state):
     print("one_a")
+    state.success()
 
 @sisyphus.job("18:12")
 def export_one_b(state):

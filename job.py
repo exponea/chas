@@ -1,7 +1,7 @@
 import datetime
 import logging
 from inspect import getargspec
-
+from state import State
 
 logger = logging.getLogger("job")
 
@@ -10,6 +10,7 @@ class Job:
         self.function = function
         self.next_run = time
         self.last_run = "N/A"
+        self.last_state = State()
     
     @property
     def should_run(self):

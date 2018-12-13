@@ -1,7 +1,8 @@
 import time
 from main import sisyphus
 
-@sisyphus.job("20:00")
+@sisyphus.job("21:35")
 def export_two(state):
-    print("two")
+    time.sleep(10)
+    state.fail()
 

@@ -2,7 +2,7 @@ import datetime
 
 class State:
     def __init__(self):
-        self.status = "Not triggered"
+        self.status = "N/A"
         self.detail = None
         self.timestamp_created = int(datetime.datetime.now().timestamp())
         self.timestamp_finished = None
