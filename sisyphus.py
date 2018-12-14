@@ -3,9 +3,11 @@ import datetime
 import argparse
 import time
 import os
-from http_server import http_server
+from http_server import http_server, HTTPServerThread
 from main import sisyphus
 
+
+http_server_thread = HTTPServerThread()
 
 # Parse command line command
 parser = argparse.ArgumentParser(description="Sisyphus system for running statefull or stateless cron jobs.")
@@ -51,7 +53,14 @@ if args.action == "list":
             print(job.name)
 elif args.action == "start":
     if args.option_http_server is True:
-        http_server.run('0.0.0.0', 5000, debug=True)
+        http_server_thread.start()
+        while True:
+            time.sleep(3)
+            print()
+            print("========== Checking jobs at {} ==========".format(datetime.datetime.now().strftime("%H:%M:%S")))
+            show_jobs_with_times()
+            print()
+            sisyphus.run_jobs()
     else:
         while True:
             time.sleep(3)

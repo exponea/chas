@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from threading import Thread
 from main import sisyphus
 
 http_server = Flask("sisyphus")
@@ -12,3 +13,8 @@ def healthz():
 @http_server.route("/")
 def main():
     return render_template("main.html", sisyphus=sisyphus)
+
+class HTTPServerThread(Thread):
+    def run(self):
+        http_server.run('0.0.0.0', 5000)
+
