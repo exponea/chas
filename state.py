@@ -8,13 +8,22 @@ class State:
         self.timestamp_finished = None
             
     def success(self):
-        self.set_status("Success")
+        self.set_status("Succeeded")
         return self
     
-    def fail(self):
-        self.set_status("Fail")
+    def failed(self):
+        self.set_status("Failed")
         return self
     
+    def running(self):
+        self.set_status("Running")
+        return self
+    
+    def finished(self):
+        if self.status not in ["Succeeded", "Failed"]:
+            self.set_status("Finished")
+        return self
+
     def result(self, res):
         self.detail = res
         return self

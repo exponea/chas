@@ -1,7 +1,7 @@
 import datetime
-import schedule
 import logging
 import time
+import copy
 from inspect import getargspec
 from state import State
 from job import Job
@@ -12,20 +12,13 @@ logger = logging.getLogger("scheduler")
 class Scheduler:
     def __init__(self):
         self.jobs = []
-        self.history = []
+    
+    @property
+    def is_runnable_job(self):
+        return self.jobs[0].should_run
     
     @classmethod
-    def heap_sort(cls, arr):
-        n = len(arr)
-        for i in range(n, -1, -1):
-            cls.heapify(arr, n, i)
-        for i in range(n):
-            smallest = arr.pop(0)
-            arr.append(smallest)
-            cls.heapify(arr, n-i-1, 0)
-    
-    @classmethod
-    def heapify(cls, arr, n, i):
+    def sift_down(cls, arr, n, i):
         left_child = 2*i+1
         right_child = 2*i+2
         smallest = i
@@ -36,7 +29,19 @@ class Scheduler:
             smallest = right_child
         if smallest != i:
             arr[smallest], arr[i] = arr[i], arr[smallest]
-            cls.heapify(arr, n, smallest)
+            cls.sift_down(arr, n, smallest)
+    
+    @classmethod
+    def sift_up(cls, arr, i):
+        if i == 0: return None
+        if i % 2 == 1:
+            parent = int((i-1) / 2)
+        else:
+            parent = int((i-2) / 2)
+        if arr[parent] > arr[i]:
+            arr[parent], arr[i] = arr[i], arr[parent]
+            return cls.sift_up(arr, parent)
+        return None
     
     # Decorator method for adding jobs
     def job(self, time):
@@ -45,21 +50,19 @@ class Scheduler:
         return register_job
     
     def register_job(self, function, time):
-        # Process time to run job, format has to be HH:MM
+        job = Job(function, time)
         hour, minute = list(map(lambda x: int(x), time.split(":")))
         datetime_now = datetime.datetime.now()
         # Job cannot be run today, because it is already too late
-        if datetime_now.hour > hour or datetime_now.hour == hour and datetime_now.minute > minute: # BUG: Even when minutes equal, we should schedule it for the next day
-            next_run_time = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day+1, hour, minute)
+        if datetime_now.hour > hour or datetime_now.hour == hour and datetime_now.minute > minute: # TODO: Even when minutes equal, we should schedule it for the next day
+            job.schedule_number_of_days_from_today(1)
         # Otherwise schedule it for today
         else:
-            next_run_time = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day, hour, minute)
-        # Create new job and add it to heap
-        job = Job(function, next_run_time)
+            job.schedule_number_of_days_from_today(0)
         self.jobs.append(job)
         # Heapify, so that the job soonest to be triggered is first
-        self.heapify(self.jobs, len(self.jobs), len(self.jobs))
-        logger.info("Registered job {}. Next run on {}".format(job.name, next_run_time))
+        self.sift_up(self.jobs, len(self.jobs)-1)
+        logger.info("Registered job {}. Next run on {}".format(job.name, job.next_run))
 
     # Run specific job by a name
     def run_job(self, name):
@@ -68,7 +71,6 @@ class Scheduler:
                 job_state = State()
                 logger.info("Running job {}".format(job.name))
                 job.run(job_state)
-                job.last_status = job_state.status
                 return job_state
         return None
     
@@ -79,19 +81,22 @@ class Scheduler:
         n = len(self.jobs)
         next_job = self.jobs[0]
         while next_job.should_run:
-            job_state = State()
             logger.info("Running job {}".format(next_job.name))
+            job_state = State()
             next_job.run(job_state)
-            next_job.last_state = job_state
-            self.history.append(job_state)
             next_job.next_run = datetime.datetime.now() + datetime.timedelta(1) # TODO: Precise scheduling HH:MM next day
-            self.heapify(self.jobs, n, 0)
+            self.sift_down(self.jobs, n, 0)
             logger.info("Scheduled next run for job {} on {}".format(next_job.name, next_job.next_run))
             next_job = self.jobs[0]
     
-    def sort_jobs(self):
-        return self.heap_sort(self.jobs)
-    
-    def get_jobs(self):
-        self.sort_jobs()
-        return self.jobs
+    # For convenience it can return list of sorted jobs
+    def get_jobs(self, sorted=True):
+        jobs = copy.deepcopy(self.jobs)
+        if sorted:
+            result = []
+            n = len(jobs)
+            for i in range(n):
+                result.append(jobs.pop(0))
+                self.sift_down(jobs, n-i-1, 0)
+            return result
+        return jobs
