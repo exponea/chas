@@ -15,10 +15,12 @@ def print_jobs_with_times():
     column_width_second = max(len(str(job.next_run)) for job in jobs) + 2
     column_width_third = max(len(job.last_state.status) for job in jobs) + 2
     print()
-    print("========== Checking jobs at {} ==========".format(datetime.datetime.now().strftime("%H:%M:%S")))
+    print("========== Checking jobs at {} ==========".format(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")))
     print("".join(["Job".ljust(column_width_first), "Next run".ljust(column_width_second), "Last run".ljust(column_width_second), "Last status".ljust(column_width_third)]))
     for job in jobs:
-        print("".join([job.name.ljust(column_width_first), str(job.next_run).ljust(column_width_second), str(job.last_run).ljust(column_width_second), str(job.last_state.status).ljust(column_width_third)]))
+        next_run = job.next_run if isinstance(job.next_run, str) else job.next_run.strftime("%d-%m-%Y %H:%M:%S")
+        last_run = job.last_run if isinstance(job.last_run, str) else job.last_run.strftime("%d-%m-%Y %H:%M:%S")
+        print("".join([job.name.ljust(column_width_first), next_run.ljust(column_width_second), last_run.ljust(column_width_second), job.last_state.status.ljust(column_width_third)]))
     print()
 
 # Find all jobs by crawling through directory

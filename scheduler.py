@@ -84,7 +84,7 @@ class Scheduler:
             logger.info("Running job {}".format(next_job.name))
             job_state = State()
             next_job.run(job_state)
-            next_job.next_run = datetime.datetime.now() + datetime.timedelta(1) # TODO: Precise scheduling HH:MM next day
+            next_job.schedule_number_of_days_from_today(1)
             self.sift_down(self.jobs, n, 0)
             logger.info("Scheduled next run for job {} on {}".format(next_job.name, next_job.next_run))
             next_job = self.jobs[0]

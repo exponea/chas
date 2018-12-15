@@ -27,8 +27,16 @@ tr:nth-child(even) {
     {% for job in sisyphus.jobs %}
         <tr>
             <td>{{ job.name }}</td>
-            <td>{{ job.next_run }}</td>
-            <td>{{ job.last_run }}</td>
+            {% if job.next_run is string %}
+                <td>{{ job.next_run }}</td>
+            {% else %}
+                <td>{{ job.next_run.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+            {% endif %}
+            {% if job.last_run is string %}
+                <td>{{ job.last_run }}</td>
+            {% else %}
+                <td>{{ job.last_run.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+            {% endif %}
             <td>{{ job.last_state.status }}</td>
         </tr>
     {% endfor %}

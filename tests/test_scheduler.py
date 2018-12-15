@@ -32,5 +32,11 @@ def test_heapify():
     scheduler.register_job(job_d, str(job_d_hours)+":"+str(job_d_minutes))
     scheduler.register_job(job_e, str(job_e_hours)+":"+str(job_e_minutes))
     assert scheduler.jobs[0].name == "job_e"
+    jobs_sorted_order = ["job_e", "job_c", "job_a", "job_b", "job_d"]
+    n = len(jobs_sorted_order)
+    for i in range(n):
+        next_job = scheduler.jobs.pop(0)
+        assert jobs_sorted_order[i] == next_job.name
+        scheduler.sift_down(scheduler.jobs, n-i-1, 0)
 
 
