@@ -1,7 +1,7 @@
 import datetime
 import logging
 from inspect import getargspec
-from state import State
+from src.state import State
 
 logger = logging.getLogger("job")
 

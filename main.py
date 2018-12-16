@@ -1,3 +1,3 @@
-from scheduler import Scheduler
+from src.scheduler import Scheduler
 
 sisyphus = Scheduler()

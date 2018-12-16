@@ -24,7 +24,7 @@ tr:nth-child(even) {
       <th>Last run</th>
       <th>Last status</th>
     </tr>
-    {% for job in sisyphus.jobs %}
+    {% for job in sisyphus.get_jobs() %}
         <tr>
             <td>{{ job.name }}</td>
             {% if job.next_run is string %}

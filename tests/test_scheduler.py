@@ -1,36 +1,11 @@
 import datetime
-from scheduler import Scheduler
+from src.scheduler import Scheduler
+from src.job import Job
 
-# Test jobs
-def job_a():
-    return None
-def job_b():
-    return None
-def job_c():
-    return None
-def job_d():
-    return None
-def job_e():
-    return None
-
-def test_heapify():
-    scheduler = Scheduler()
-    datetime_now = datetime.datetime.now()
-    job_a_time = datetime_now + datetime.timedelta(minutes=10)
-    job_b_time = datetime_now + datetime.timedelta(minutes=15)
-    job_c_time = datetime_now + datetime.timedelta(minutes=7)
-    job_d_time = datetime_now + datetime.timedelta(minutes=19)
-    job_e_time = datetime_now + datetime.timedelta(minutes=4)
-    job_a_hours, job_a_minutes = job_a_time.hour, job_a_time.minute
-    job_b_hours, job_b_minutes = job_b_time.hour, job_b_time.minute
-    job_c_hours, job_c_minutes = job_c_time.hour, job_c_time.minute
-    job_d_hours, job_d_minutes = job_d_time.hour, job_d_time.minute
-    job_e_hours, job_e_minutes = job_e_time.hour, job_e_time.minute
-    scheduler.register_job(job_a, str(job_a_hours)+":"+str(job_a_minutes))
-    scheduler.register_job(job_b, str(job_b_hours)+":"+str(job_b_minutes))
-    scheduler.register_job(job_c, str(job_c_hours)+":"+str(job_c_minutes))
-    scheduler.register_job(job_d, str(job_d_hours)+":"+str(job_d_minutes))
-    scheduler.register_job(job_e, str(job_e_hours)+":"+str(job_e_minutes))
+# Test scenario when job is executed find the soonest job to run
+# Used in updating the heap
+def test_sift_down(create_scheduler_with_jobs):
+    scheduler = create_scheduler_with_jobs
     assert scheduler.jobs[0].name == "job_e"
     jobs_sorted_order = ["job_e", "job_c", "job_a", "job_b", "job_d"]
     n = len(jobs_sorted_order)
@@ -39,4 +14,18 @@ def test_heapify():
         assert jobs_sorted_order[i] == next_job.name
         scheduler.sift_down(scheduler.jobs, n-i-1, 0)
 
+
+# Create a job which will run the soonest and let it propagate up
+# Used in registering new jobs
+def test_sift_up(create_scheduler_with_jobs):
+    scheduler = create_scheduler_with_jobs
+    def job_f():
+        return None
+    job_f_time = datetime.datetime.now() + datetime.timedelta(minutes=2)
+    job_f_hours, job_f_minutes = job_f_time.hour, job_f_time.minute
+    job = Job(job_f, str(job_f_hours)+":"+str(job_f_minutes))
+    job.next_run = job_f_time
+    scheduler.jobs.append(job)
+    scheduler.sift_up(scheduler.jobs, len(scheduler.jobs)-1)
+    assert scheduler.jobs[0].name == "job_f"
 

@@ -3,8 +3,8 @@ import logging
 import time
 import copy
 from inspect import getargspec
-from state import State
-from job import Job
+from src.state import State
+from src.job import Job
 
 
 logger = logging.getLogger("scheduler")
