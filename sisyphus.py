@@ -63,7 +63,7 @@ elif args.action == "start": # python sisyphus.py start
     if args.option_http_server is True:
         # Start Flask app in a different thread
         http_server_thread.start()
-        time.sleep(3)
+        time.sleep(1)
         print_jobs_with_times()
         # Cron jobs will run in main thread
         while True:

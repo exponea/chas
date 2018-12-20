@@ -14,6 +14,11 @@ def healthz():
 def main():
     return render_template("main.html", sisyphus=sisyphus)
 
+@http_server.route("/jobs/<job_name>/restart", methods=["POST"])
+def job_restart(job_name):
+    sisyphus.run_job(job_name)
+    return "ok"
+
 class HTTPServerThread(Thread):
     def run(self):
         http_server.run('0.0.0.0', 5000)

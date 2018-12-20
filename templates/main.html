@@ -1,28 +1,33 @@
 <!doctype html>
-<style>
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
+<head>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
 
-td, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
 
-tr:nth-child(even) {
-    background-color: #dddddd;
-}
-</style>
-<title>Jobs</title>
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+    </style>
+    <title>Sisyphus</title>
+</head>
+<body>
 <table>
     <tr>
       <th>Name</th>
       <th>Next run</th>
       <th>Last run</th>
       <th>Last status</th>
+      <th>Restart</th>
     </tr>
     {% for job in sisyphus.get_jobs() %}
         <tr>
@@ -38,6 +43,14 @@ tr:nth-child(even) {
                 <td>{{ job.last_run.strftime("%d-%m-%Y %H:%M:%S") }}</td>
             {% endif %}
             <td>{{ job.last_state.status }}</td>
+            <td>
+                <form class="form_job_restart">
+                    <input type="hidden" name="job_name" value="{{ job.name }}" />
+                    <input type="submit" value="Restart"></input>
+                </form>
+            </td>
         </tr>
     {% endfor %}
 </table>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
