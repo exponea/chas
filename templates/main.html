@@ -18,7 +18,7 @@
         background-color: #dddddd;
     }
     </style>
-    <title>Sisyphus</title>
+    <title>Chas</title>
 </head>
 <body>
 <table>
@@ -29,7 +29,7 @@
       <th>Last status</th>
       <th>Restart</th>
     </tr>
-    {% for job in sisyphus.get_jobs() %}
+    {% for job in chas.get_jobs() %}
         <tr>
             <td>{{ job.name }}</td>
             {% if job.next_run is string %}

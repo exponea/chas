@@ -45,6 +45,7 @@ class Scheduler:
     
     # Decorator method for adding jobs
     def job(self, time):
+        print("registering jobs")
         def register_job(job):
             self.register_job(job, time)
         return register_job

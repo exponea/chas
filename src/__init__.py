@@ -1,3 +1,5 @@
 from src.scheduler import Scheduler
 
-sisyphus = Scheduler()
+
+name = "chas"
+chas = Scheduler()

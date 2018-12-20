@@ -1,8 +1,9 @@
 from flask import Flask, render_template
 from threading import Thread
-from main import sisyphus
+from src import chas
 
-http_server = Flask("sisyphus")
+
+http_server = Flask("chas")
 
 http_server.logger.setLevel("DEBUG")
 
@@ -12,11 +13,11 @@ def healthz():
 
 @http_server.route("/")
 def main():
-    return render_template("main.html", sisyphus=sisyphus)
+    return render_template("main.html", chas=chas)
 
 @http_server.route("/jobs/<job_name>/restart", methods=["POST"])
 def job_restart(job_name):
-    sisyphus.run_job(job_name)
+    chas.run_job(job_name)
     return "ok"
 
 class HTTPServerThread(Thread):

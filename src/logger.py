@@ -1,5 +1,5 @@
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("sisyphus")
-logger.info("Initialized sisyphus.")
+logger = logging.getLogger("chas")
+logger.info("Initialized chas.")
