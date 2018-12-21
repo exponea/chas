@@ -45,10 +45,17 @@ class Scheduler:
     
     # Decorator method for adding jobs
     def job(self, time):
-        print("registering jobs")
+        logger.debug("Registering job.")
         def register_job(job):
             self.register_job(job, time)
         return register_job
+    
+    # Decorator for setting up the environment of cron job
+    def setup(self):
+        logger.debug("Setting up environment.")
+        def setup_job(job):
+            job()
+        return setup_job
     
     def register_job(self, function, time):
         job = Job(function, time)
