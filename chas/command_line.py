@@ -61,6 +61,10 @@ def main():
 
     # Register all chas jobs within the directory
     chas = import_files_from_directory()
+
+    if chas is None:
+        print("No jobs registered.")
+        return None
     
     # Process command line command
     if args.action == "list": # python chas.py list

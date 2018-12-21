@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="chas",
-    version="0.2.0",
+    version="0.2.1",
     author="Lukas Cerny",
     author_email="lukas.cerny@exponea.com",
     description="Framework for creating and running cron jobs.",
@@ -16,6 +16,7 @@ setuptools.setup(
     entry_points = {
         "console_scripts": ["chas=chas.command_line:main"],
     },
+    install_requires=["flask"],
     url="https://github.com/lukasotocerny/chas",
     classifiers=[
         "Programming Language :: Python :: 3.6",
