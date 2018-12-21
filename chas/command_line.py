@@ -4,12 +4,11 @@ import datetime
 import argparse
 import time
 import os
-from src.http_server import http_server, HTTPServerThread
-from src import chas
+from chas.http_server import http_server, HTTPServerThread
 
 
 # Helper to show all jobs with next run times
-def print_jobs_with_times():
+def print_jobs_with_times(chas):
     jobs = chas.get_jobs()
     if len(jobs) == 0:
         print("No jobs are registered.")
@@ -28,22 +27,26 @@ def print_jobs_with_times():
     print()
 
 # Find all jobs by crawling through directory
-def import_files_from_directory(directory=os.getcwd()):
+def import_files_from_directory(directory=os.getcwd(), chas=None):
     files = [os.path.join(directory, name) for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name)) and "job_" == name[:4] and ".py" == name[-3:]]
     for file_path in files:
         module_name = os.path.basename(file_path)[:-3]
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
+        if chas is None:
+            chas = foo.chas
     directories = [name for name in os.listdir(directory) if os.path.isdir(name) and "." != name[0] and "__" != name[:2]]
     for directory_name in directories:
-        import_files_from_directory(directory_name)
+        import_files_from_directory(directory_name, chas)
+    return chas
 
 
 ###
 ###  Main script
 ###
 def main():
+    chas = None
     http_server_thread = HTTPServerThread()
 
     # Create a command line parser
@@ -55,31 +58,29 @@ def main():
     args = parser.parse_args()
 
     # Register all chas jobs within the directory
-    import_files_from_directory()
-
-    print(chas.jobs)
-
+    chas = import_files_from_directory()
+    
     # Process command line command
     if args.action == "list": # python chas.py list
         jobs = chas.get_jobs()
-        print_jobs_with_times()
+        print_jobs_with_times(chas)
     elif args.action == "start": # python chas.py start
         if args.option_http_server is True:
             # Start Flask app in a different thread
             http_server_thread.start()
             time.sleep(1)
-            print_jobs_with_times()
+            print_jobs_with_times(chas)
             # Cron jobs will run in main thread
             while True:
                 time.sleep(3)
                 if chas.is_runnable_job:
                     chas.run_jobs()
-                    print_jobs_with_times()
+                    print_jobs_with_times(chas)
         while True:
             time.sleep(3)
             if chas.is_runnable_job:
                 chas.run_jobs()
-                print_jobs_with_times()
+                print_jobs_with_times(chas)
     elif args.action == "run": # python chas.py run
         print("Running job {}".format(args.job))
         state = chas.run_job(args.job)

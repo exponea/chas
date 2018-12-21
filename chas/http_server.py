@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from threading import Thread
-from src import chas
+from chas import chas
+import os
 
 
 http_server = Flask("chas")
@@ -18,7 +19,7 @@ def main():
 @http_server.route("/jobs/<job_name>/restart", methods=["POST"])
 def job_restart(job_name):
     chas.run_job(job_name)
-    return "ok"
+    return "{}".format(os.__file__)
 
 class HTTPServerThread(Thread):
     def run(self):
