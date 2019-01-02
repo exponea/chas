@@ -3,6 +3,7 @@ import importlib.util
 import datetime
 import argparse
 import time
+import sys
 import os
 from chas.http_server import http_server, HTTPServerThread
 
@@ -29,18 +30,25 @@ def print_jobs_with_times(chas, checking=True):
         print()
 
 # Find all jobs by crawling through directory
-def import_files_from_directory(directory=os.getcwd(), chas=None):
-    files = [os.path.join(directory, name) for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name)) and "job_" == name[:4] and ".py" == name[-3:]]
+def import_files_from_directory(directory=os.getcwd(), chas=None, package=None):
+    if package is not None:
+        package = package[0] # argparse module returns a list of arguments
+        file_path = os.path.join(directory, package, "__init__.py")
+        spec = importlib.util.spec_from_file_location(package, file_path)
+        foo = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(foo)
+        return foo.chas
+    files = [os.path.join(directory, name) for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name)) and "main.py" == name] # "job_" == name[:4] and ".py" == name[-3:]]
     for file_path in files:
         module_name = os.path.basename(file_path)[:-3]
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
-        if chas is None:
+        if chas is None and hasattr(foo, "chas"):
             chas = foo.chas
-    directories = [name for name in os.listdir(directory) if os.path.isdir(name) and "." != name[0] and "__" != name[:2]]
+    directories = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name)) and "." != name[0] and "__" != name[:2]]
     for directory_name in directories:
-        import_files_from_directory(directory_name, chas)
+        import_files_from_directory(os.path.join(directory, directory_name), chas)
     return chas
 
 
@@ -55,12 +63,13 @@ def main():
     parser = argparse.ArgumentParser(description="chas system for running statefull or stateless cron jobs.")
     parser.add_argument("action", choices=["list", "start", "run"])
     parser.add_argument("job", nargs="?")
+    parser.add_argument("--package", nargs=1, dest="option_package")
     parser.add_argument("--show-times", action="store_true", dest="option_show_times")
     parser.add_argument("--http-server", action="store_true", dest="option_http_server")
     args = parser.parse_args()
-
     # Register all chas jobs within the directory
-    chas = import_files_from_directory()
+    sys.path.append(os.getcwd())
+    chas = import_files_from_directory(package=args.option_package)
 
     if chas is None:
         print("No jobs registered.")
