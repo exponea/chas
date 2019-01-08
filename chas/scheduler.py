@@ -80,7 +80,7 @@ class Scheduler:
                 logger.info("Running job {}".format(job.name))
                 job.run(job_state)
                 return job_state
-        return None
+        raise Exception("Job {} not found.".format(name))
     
     # Iterates through all jobs and runs those that should be run by now
     # It does so by checking the job on top of the heap

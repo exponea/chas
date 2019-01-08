@@ -63,7 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description="chas system for running statefull or stateless cron jobs.")
     parser.add_argument("action", choices=["list", "start", "run"])
     parser.add_argument("job", nargs="?")
-    parser.add_argument("--package", nargs=1, dest="option_package")
+    parser.add_argument("--package", "-p", nargs=1, dest="option_package")
     parser.add_argument("--show-times", action="store_true", dest="option_show_times")
     parser.add_argument("--http-server", action="store_true", dest="option_http_server")
     args = parser.parse_args()
@@ -76,10 +76,10 @@ def main():
         return None
     
     # Process command line command
-    if args.action == "list": # python chas.py list
+    if args.action == "list":
         jobs = chas.get_jobs()
         print_jobs_with_times(chas, checking=False)
-    elif args.action == "start": # python chas.py start
+    elif args.action == "start":
         if args.option_http_server is True:
             # Start Flask app in a different thread
             http_server_thread.start()
@@ -91,15 +91,14 @@ def main():
                 if chas.is_runnable_job:
                     chas.run_jobs()
                     print_jobs_with_times(chas)
-        while True:
-            time.sleep(3)
-            if chas.is_runnable_job:
-                chas.run_jobs()
-                print_jobs_with_times(chas)
-    elif args.action == "run": # python chas.py run
-        print("Running job {}".format(args.job))
+        else:
+            print_jobs_with_times(chas)
+            while True:
+                time.sleep(3)
+                if chas.is_runnable_job:
+                    chas.run_jobs()
+                    print_jobs_with_times(chas)
+    elif args.action == "run":
         state = chas.run_job(args.job)
         if state is None:
             print("Job {} was not found.")
-        else:
-            print("Job {} ended with status {}".format(args.job, state.status))
