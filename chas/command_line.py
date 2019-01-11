@@ -6,6 +6,7 @@ import time
 import sys
 import os
 from chas.http_server import http_server, HTTPServerThread
+from chas.exceptions import JobNotFoundException
 
 
 # Helper to show all jobs with next run times
@@ -99,6 +100,10 @@ def main():
                     chas.run_jobs()
                     print_jobs_with_times(chas)
     elif args.action == "run":
-        state = chas.run_job(args.job)
-        if state is None:
-            print("Job {} was not found.")
+        try:
+            state = chas.run_job(args.job)
+        except Exception as e:
+            if isinstance(e, JobNotFoundException):
+                print(e)
+            else:
+                raise(e)

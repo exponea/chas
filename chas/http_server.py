@@ -1,7 +1,8 @@
+import os
+from chas.exceptions import JobNotFoundException
 from flask import Flask, render_template
 from threading import Thread
 from chas import chas
-import os
 
 
 http_server = Flask("chas")
@@ -16,20 +17,13 @@ def healthz():
 def main():
     return render_template("main.html", chas=chas)
 
-@http_server.route("/jobs/<job_name>/restart", methods=["POST"])
-def job_restart(job_name):
-    print("new request for RESTART {}".format(job_name))
-    job_thread = Thread(target=run_job, args=[job_name])
-    job_thread.start()
-    return "{}".format(os.__file__)
-
-
-# Callable target for a thread, which runs the job
-def run_job(job_name):
+@http_server.route("/jobs/<job_name>/run", methods=["POST"])
+def job_run(job_name):
     try:
-        state = chas.run_job(job_name)
-    except Exception as e:
-        print("Expection in job thread: {}".format(str(e)))
+        chas.run_job(job_name)
+    except JobNotFoundException as e:
+        return "Job {} not found\n".format(job_name), 202
+    return "ok", 200
 
 
 class HTTPServerThread(Thread):

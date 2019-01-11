@@ -27,7 +27,7 @@
       <th>Next run</th>
       <th>Last run</th>
       <th>Last status</th>
-      <th>Restart</th>
+      <th>Run</th>
     </tr>
     {% for job in chas.get_jobs() %}
         <tr>
@@ -42,11 +42,15 @@
             {% else %}
                 <td>{{ job.last_run.strftime("%d-%m-%Y %H:%M:%S") }}</td>
             {% endif %}
-            <td>{{ job.last_state.status }}</td>
+            <td>{{ job.last_state.status }}
+                {% if job.last_state.detail is not none %}
+                ({{ job.last_state.detail }})
+                {% endif %}
+            </td>
             <td>
-                <form class="form_job_restart">
+                <form class="form_job_run">
                     <input type="hidden" name="job_name" value="{{ job.name }}" />
-                    <input type="submit" value="Restart"></input>
+                    <input type="submit" value="Run"></input>
                 </form>
             </td>
         </tr>

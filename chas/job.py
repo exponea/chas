@@ -2,6 +2,7 @@ import datetime
 import logging
 from inspect import getargspec
 from chas.state import State
+from threading import Thread
 
 logger = logging.getLogger("job")
 
@@ -64,3 +65,11 @@ class Job:
     
     def update_next_run_time(self, run_time):
         self.next_run = run_time
+
+
+# Spawn a new thread with the job
+class JobThread(Thread):
+    def __init__(self, job, state):
+        self.job = job
+        self.state = state
+        super(JobThread, self).__init__(target=job.run, kwargs={"input_state": self.state})
