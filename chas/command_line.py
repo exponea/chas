@@ -32,6 +32,7 @@ def print_jobs_with_times(chas, checking=True):
 
 # Find all jobs by crawling through directory
 def import_files_from_directory(directory=os.getcwd(), chas=None, package=None):
+    # Import jobs from inside a package by importing to top level module
     if package is not None:
         package = package[0] # argparse module returns a list of arguments
         file_path = os.path.join(directory, package, "__init__.py")
@@ -39,7 +40,8 @@ def import_files_from_directory(directory=os.getcwd(), chas=None, package=None):
         foo = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(foo)
         return foo.chas
-    files = [os.path.join(directory, name) for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name)) and "main.py" == name] # "job_" == name[:4] and ".py" == name[-3:]]
+    # Import jobs which are sparsed across current working directory
+    files = [os.path.join(directory, name) for name in os.listdir(directory) if os.path.isfile(os.path.join(directory, name)) and "job_" == name[:4] and ".py" == name[-3:]]
     for file_path in files:
         module_name = os.path.basename(file_path)[:-3]
         spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -47,7 +49,7 @@ def import_files_from_directory(directory=os.getcwd(), chas=None, package=None):
         spec.loader.exec_module(foo)
         if chas is None and hasattr(foo, "chas"):
             chas = foo.chas
-    directories = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name)) and "." != name[0] and "__" != name[:2]]
+    directories = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name)) and "." != name[0] and "__" != name[:2] and name not in ["bin", "include", "lib"]]
     for directory_name in directories:
         import_files_from_directory(os.path.join(directory, directory_name), chas)
     return chas
