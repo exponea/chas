@@ -73,16 +73,25 @@ class Scheduler:
         self.sift_up(self.jobs, len(self.jobs)-1)
         logger.info("Registered job {}. Next run on {}".format(job.name, job.next_run))
 
-    # Run specific job by a name
-    def run_job(self, name):
-        for job in self.jobs:
-            if name == job.name:
-                job_state = State()
-                logger.info("Running job {} in thread.".format(job.name))
-                job_thread = JobThread(job, job_state)
-                job_thread.start()
-                return True
-        raise JobNotFoundException(name)
+    # Run specific job either by name, search for the correct one
+    # or you can directly run the job when passed as argument
+    def run_job(self, name=None, job=None):
+        job_to_run = None
+        if job is not None:
+            job_to_run = job
+        else:
+            # Search for job by name
+            for j in self.jobs:
+                if name == j.name:
+                    job_to_run = j
+                    break
+            if job_to_run is None:
+                raise JobNotFoundException(name)
+        job_state = State()
+        logger.info("Running job {} in thread.".format(job_to_run.name))
+        job_thread = JobThread(job_to_run, job_state)
+        job_thread.start()
+        return True
     
     # Iterates through all jobs and runs those that should be run by now
     # It does so by checking the job on top of the heap
@@ -92,8 +101,7 @@ class Scheduler:
         next_job = self.jobs[0]
         while next_job.should_run:
             logger.info("Running job {}".format(next_job.name))
-            job_state = State()
-            next_job.run(job_state)
+            self.run_job(job=next_job)
             next_job.schedule_number_of_days_from_today(1)
             self.sift_down(self.jobs, n, 0)
             logger.info("Scheduled next run for job {} on {}".format(next_job.name, next_job.next_run))

@@ -20,7 +20,7 @@ def main():
 @http_server.route("/jobs/<job_name>/run", methods=["POST"])
 def job_run(job_name):
     try:
-        chas.run_job(job_name)
+        chas.run_job(name=job_name)
     except JobNotFoundException as e:
         return "Job {} not found\n".format(job_name), 202
     return "ok", 200

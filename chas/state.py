@@ -13,8 +13,10 @@ class State:
             self.detail = detail
         return self
     
-    def failed(self):
+    def failed(self, detail=None):
         self.status = "Failed"
+        if detail is not None:
+            self.detail = detail
         return self
     
     def running(self):

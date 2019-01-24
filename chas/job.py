@@ -49,10 +49,15 @@ class Job:
         self.last_state = input_state
         self.last_state.running()
         # Check whether function uses state parameter
-        if self.uses_state:
-            self.function(self.last_state)
-        else:
-            self.function()
+        # Catch any exceptions
+        try:
+            if self.uses_state:
+                self.function(self.last_state)
+            else:
+                self.function()
+        except Exception as e:
+            self.last_state.failed("{}: {}".format(e.__class__.__name__, str(e)))
+            return self.last_state
         self.last_state.finished()
         return self.last_state
     
