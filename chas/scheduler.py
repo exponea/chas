@@ -75,7 +75,7 @@ class Scheduler:
 
     # Run specific job either by name, search for the correct one
     # or you can directly run the job when passed as argument
-    def run_job(self, name=None, job=None):
+    def run_job(self, name=None, job=None, different_thread=True):
         job_to_run = None
         if job is not None:
             job_to_run = job
@@ -89,8 +89,14 @@ class Scheduler:
                 raise JobNotFoundException(name)
         job_state = State()
         logger.info("Running job {} in thread.".format(job_to_run.name))
-        job_thread = JobThread(job_to_run, job_state)
-        job_thread.start()
+        if different_thread:
+            try:
+                job_thread = JobThread(job_to_run, job_state)
+                job_thread.start()
+            except Exception:
+                pass
+        else:
+            job_to_run.run(job_state)
         return True
     
     # Iterates through all jobs and runs those that should be run by now

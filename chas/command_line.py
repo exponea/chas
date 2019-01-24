@@ -103,7 +103,7 @@ def main():
                     print_jobs_with_times(chas)
     elif args.action == "run":
         try:
-            state = chas.run_job(name=args.job)
+            state = chas.run_job(name=args.job, different_thread=False)
         except Exception as e:
             if isinstance(e, JobNotFoundException):
                 print(e)

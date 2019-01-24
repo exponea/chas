@@ -57,7 +57,7 @@ class Job:
                 self.function()
         except Exception as e:
             self.last_state.failed("{}: {}".format(e.__class__.__name__, str(e)))
-            return self.last_state
+            raise(e)
         self.last_state.finished()
         return self.last_state
     
