@@ -65,7 +65,7 @@ class Job:
         # Process time to run job, format has to be HH:MM
         hour, minute = list(map(lambda x: int(x), self.registered_time.split(":")))
         datetime_now = datetime.datetime.now()
-        self.next_run = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day+days, hour, minute)
+        self.next_run = datetime.datetime(datetime_now.year, datetime_now.month, datetime_now.day, hour, minute) + datetime.timedelta(days)
         return self.next_run
     
     def update_next_run_time(self, run_time):
