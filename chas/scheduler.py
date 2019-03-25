@@ -115,7 +115,9 @@ class Scheduler:
     
     # For convenience it can return list of sorted jobs
     def get_jobs(self, sorted=True):
-        jobs = copy.deepcopy(self.jobs)
+        jobs = []
+        for job in self.jobs:
+            jobs.append(job)
         if sorted:
             result = []
             n = len(jobs)

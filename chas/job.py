@@ -1,6 +1,7 @@
 import datetime
 import logging
 from inspect import getargspec
+from prometheus_client import Counter
 from chas.state import State
 from threading import Thread
 
@@ -13,6 +14,9 @@ class Job:
         self.next_run = None
         self.last_run = "N/A"
         self.last_state = State()
+        self.metric_total = Counter("{}_runs".format(self.name), "Total runs of jobs {}.".format(self.name))
+        self.metric_successful = Counter("{}_success".format(self.name), "Total number of successful jobs {}.".format(self.name))
+        self.metric_failed = Counter("{}_fails".format(self.name), "Total number of failed jobs {}.".format(self.name))
     
     @property
     def should_run(self):
@@ -45,6 +49,7 @@ class Job:
     def run(self, input_state=State()):
         datetime_now = datetime.datetime.now()
         logger.info("Running job {} at {}".format(self.name, datetime_now))
+        self.metric_total.inc()
         self.last_run = datetime_now
         self.last_state = input_state
         self.last_state.running()
@@ -57,7 +62,13 @@ class Job:
                 self.function()
         except Exception as e:
             self.last_state.failed("{}: {}".format(e.__class__.__name__, str(e)))
+            self.metric_failed.inc()
             raise(e)
+        # Track either success or failure
+        if self.last_state.status == "Succeeded":
+            self.metric_successful.inc()
+        elif self.last_state.status == "Failed":
+            self.metric_failed.inc()
         self.last_state.finished()
         return self.last_state
     

@@ -1,4 +1,5 @@
 import os
+from prometheus_flask_exporter import PrometheusMetrics
 from chas.exceptions import JobNotFoundException
 from flask import Flask, render_template
 from threading import Thread
@@ -6,8 +7,12 @@ from chas import chas
 
 
 http_server = Flask("chas")
+# Set up Prometheus listening on /metrics endpoint
+metrics = PrometheusMetrics(http_server)
 
 http_server.logger.setLevel("DEBUG")
+
+metrics.info('app_info', 'Chas version info', version='0.4.0')
 
 @http_server.route("/healthz")
 def healthz():
