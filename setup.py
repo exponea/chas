@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="chas",
-    version="0.4.0",
+    version="0.4.1",
     author="Lukas Cerny",
     author_email="lukas.cerny@exponea.com",
     description="Framework for creating and running cron jobs.",
