@@ -8,9 +8,10 @@ from threading import Thread
 logger = logging.getLogger("job")
 
 class Job:
-    def __init__(self, function, time):
+    def __init__(self, function, time, manual=True):
         self.function = function
         self.registered_time = time
+        self.manual = manual
         self.next_run = None
         self.last_run = "N/A"
         self.last_state = State()

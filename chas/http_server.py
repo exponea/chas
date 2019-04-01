@@ -12,7 +12,7 @@ metrics = PrometheusMetrics(http_server)
 
 http_server.logger.setLevel("DEBUG")
 
-metrics.info('app_info', 'Chas version info', version='0.4.2')
+metrics.info('app_info', 'Chas version info', version='0.4.3')
 
 @http_server.route("/healthz")
 def healthz():

@@ -45,10 +45,10 @@ class Scheduler:
         return None
     
     # Decorator method for adding jobs
-    def job(self, time):
+    def job(self, time, manual=True):
         logger.debug("Registering job.")
         def register_job(job):
-            self.register_job(job, time)
+            self.register_job(job, time, manual=manual)
         return register_job
     
     # Decorator for setting up the environment of cron job
@@ -58,8 +58,8 @@ class Scheduler:
             job()
         return setup_job
     
-    def register_job(self, function, time):
-        job = Job(function, time)
+    def register_job(self, function, time, manual=True):
+        job = Job(function, time, manual=manual)
         hour, minute = list(map(lambda x: int(x), time.split(":")))
         datetime_now = datetime.datetime.now()
         # Job cannot be run today, because it is already too late

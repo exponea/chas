@@ -50,7 +50,7 @@
             <td>
                 <form class="form_job_run">
                     <input type="hidden" name="job_name" value="{{ job.name }}" />
-                    <input type="submit" value="Run"></input>
+                    <input type="submit" value="Run" {% if job.manual == false %}disabled{% endif %}></input>
                 </form>
             </td>
         </tr>
