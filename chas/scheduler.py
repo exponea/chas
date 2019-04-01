@@ -119,10 +119,5 @@ class Scheduler:
         for job in self.jobs:
             jobs.append(job)
         if sorted:
-            result = []
-            n = len(jobs)
-            for i in range(n):
-                result.append(jobs.pop(0))
-                self.sift_down(jobs, n-i-1, 0)
-            return result
+            jobs.sort(key=Job.get_name)
         return jobs

@@ -28,6 +28,10 @@ class Job:
     def name(self):
         return self.function.__name__
     
+    @staticmethod
+    def get_name(job):
+        return job.name
+    
     # Override native greater than by comparing times of next run
     def __gt__(self, other):
         if isinstance(other, Job):
