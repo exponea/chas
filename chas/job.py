@@ -15,6 +15,10 @@ class Job:
         self.next_run = None
         self.last_run = "N/A"
         self.last_state = State()
+        counter_status.labels(job=self.name, status="failed").inc(0)
+        counter_status.labels(job=self.name, status="succeeded").inc(0)
+        counter_total.labels(job=self.name).inc(0)
+
     
     @property
     def should_run(self):
