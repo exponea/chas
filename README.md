@@ -49,3 +49,23 @@ def print_env_var():
     print(os.environ["foo"])
 ```
 On run would print `bar`.
+
+
+### Packages
+In case you structure your directory as a Python package, you will need to export all scripts with `@chas.job` from the package. Then, you will run all shell commands as above, but with adding parameter `--package folder_name` where `folder_name` specifies the entry point to your package.
+For example, if you structure your package in the following way:
+```
+.
+|-- src
+|   -- __init__.py
+|   -- script_one.py
+|   -- script_two.py 
+|-- LICENSE
+|-- README.md
+```
+Then you can run `chas list --package src`.
+
+
+### Prometheus
+When starting the server with option `--http-server`, `chas` automatically opens up Prometheus metrics endpoint on `/metrics`. This allows you to easily monitor your chas script with Prometheus and complementary tools like Grafana, Alertmanager etc.
+The two metrics gathered are Counter-type objects named `job_runs_total` and `job_runs_status_total`, first denoting the number of times a job was run and the second also counting their statuses, either `failed` or `succeeded`.
