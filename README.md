@@ -69,3 +69,7 @@ Then you can run `chas list --package src`.
 ### Prometheus
 When starting the server with option `--http-server`, `chas` automatically opens up Prometheus metrics endpoint on `/metrics`. This allows you to easily monitor your chas script with Prometheus and complementary tools like Grafana, Alertmanager etc.
 The two metrics gathered are Counter-type objects named `job_runs_total` and `job_runs_status_total`, first denoting the number of times a job was run and the second also counting their statuses, either `failed` or `succeeded`.
+
+## Troubleshooting
+What to do in case of ModuleNotFound error?
+- This can happen due to incorrect PYTHONPATH environment variable. Make sure current working directory is in there. You can check it by `echo $PYTHONPATH`. Otherwise to append current working directory, run `export PYTHONPATH="${PYTHONPATH}:${PWD}"`.
